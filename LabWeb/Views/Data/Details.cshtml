@@ -1,0 +1,14 @@
+﻿@model LabWeb.ViewModel.DetailsViewModel
+<a class="btn btn-dark" asp-controller="Table" asp-action="Create" asp-route-id="@Model.dataBase.Id"><i class="bi bi-plus-square-fill"></i>Create New Table</a>
+<table class="table">
+	@foreach (var table in Model.Tables)
+	{
+		<tr>
+			<td>@table.Id</td>
+			<td>@table.Name</td>
+			<td>
+				<a class="btn btn-primary" asp-action="Details" asp-route-id="@table.Id"><i class="bi bi-sliders2"></i>Open</a>
+			</td>
+		</tr>
+	}
+</table>

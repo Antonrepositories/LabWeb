@@ -1,0 +1,14 @@
+﻿@model IEnumerable<LabWeb.Models.DataBase>
+<h2>Database</h2>
+<a class="btn btn-dark" asp-controller="Data" asp-action="Create"><i class="bi bi-plus-square-fill"></i>Create New</a>
+<table class="table">
+	@foreach (var dataBase in Model)
+	{
+		<tr>
+			<td>@dataBase.Name</td>
+			<td>
+				<a class="btn btn-primary" asp-action="Details" asp-route-id="@dataBase.Id"><i class="bi bi-sliders2"></i>Open</a>
+			</td>
+		</tr>
+	}
+</table>

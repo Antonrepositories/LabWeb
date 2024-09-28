@@ -1,0 +1,78 @@
+﻿@model LabWeb.ViewModel.CreateTableViewModel
+<h2>Create a New Table</h2>
+
+<form asp-action="CreateTable" method="post">
+    <input type="hidden" name="baseId" value="@Model.BaseId" />
+    <div class="form-group">
+        <label for="tableName">Table Name</label>
+        <input type="text" class="form-control" id="tableName" name="tableName" placeholder="Enter table name" required />
+    </div>
+
+    <hr />
+    
+    <h4>Fields</h4>
+    
+    <div id="fields-container">
+    </div>
+    
+    <button type="button" class="btn btn-secondary" onclick="addField()">Add Field</button>
+
+    <hr />
+
+    <button type="submit" class="btn btn-primary">Create Table</button>
+</form>
+
+@section Scripts {
+    <script>
+        let fieldCounter = 0;
+
+        function addField() {
+            fieldCounter++;
+            const container = document.getElementById("fields-container");
+
+            const fieldDiv = document.createElement("div");
+            fieldDiv.classList.add("form-group");
+
+            const label = document.createElement("label");
+            label.innerText = "Field " + fieldCounter;
+            fieldDiv.appendChild(label);
+
+            // Field name input
+            const inputFieldName = document.createElement("input");
+            inputFieldName.type = "text";
+            inputFieldName.classList.add("form-control");
+            inputFieldName.name = "fieldNames";
+            inputFieldName.placeholder = "Enter field name";
+            inputFieldName.required = true;
+            fieldDiv.appendChild(inputFieldName);
+
+            // Data type select
+            const selectDataType = document.createElement("select");
+            selectDataType.name = "dataTypes";
+            selectDataType.classList.add("form-control");
+            selectDataType.required = true;
+
+            const options = ["integer", "real", "char", "string"];
+            options.forEach(option => {
+                const opt = document.createElement("option");
+                opt.value = option;
+                opt.text = option;
+                selectDataType.appendChild(opt);
+            });
+
+            fieldDiv.appendChild(selectDataType);
+
+            // Button to remove the field
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.classList.add("btn", "btn-danger", "mt-2");
+            removeButton.innerText = "Remove Field";
+            removeButton.onclick = function() {
+                container.removeChild(fieldDiv);
+            };
+            fieldDiv.appendChild(removeButton);
+
+            container.appendChild(fieldDiv);
+        }
+    </script>
+}
