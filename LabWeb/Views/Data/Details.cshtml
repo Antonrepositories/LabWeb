@@ -4,10 +4,10 @@
 	@foreach (var table in Model.Tables)
 	{
 		<tr>
-			<td>@table.Id</td>
 			<td>@table.Name</td>
 			<td>
-				<a class="btn btn-primary" asp-action="Details" asp-route-id="@table.Id"><i class="bi bi-sliders2"></i>Open</a>
+				<a class="btn btn-primary" asp-controller="Table" asp-action="Details" asp-route-id="@table.Id"><i class="bi bi-sliders2"></i>Open</a>
+				<a class="btn btn-danger" asp-controller="Table" asp-action="Delete" asp-route-id="@table.Id"><i class="bi bi-sliders2"></i>Delete</a>
 			</td>
 		</tr>
 	}

@@ -1,6 +1,7 @@
 ﻿using LabWeb.Models;
 using LabWeb.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LabWeb.Controllers
 {
@@ -20,8 +21,17 @@ namespace LabWeb.Controllers
 			model.BaseId = dataBase.Id;
 			return View(model);
 		}
-		
-		
+		public IActionResult Details(int? id)
+		{
+			TableDetailsViewModel model = new TableDetailsViewModel();
+			var table = _context.Tables.FirstOrDefault(x => x.Id == id);
+			model.table = table;
+			var rows = _context.Rows.Where(f => f.Table == table).ToList();
+			model.rows = rows;
+			return View(model);
+		}
+
+
 		[HttpPost]
 		public async Task<IActionResult> CreateTable(int baseId, string tableName, List<string> fieldNames, List<string> dataTypes)
 		{
@@ -60,5 +70,37 @@ namespace LabWeb.Controllers
 			return RedirectToAction("Index", "Data");
 		}
 
+		public async Task<IActionResult> Delete(int? id)
+		{
+			if (id == null || _context.Tables == null)
+			{
+				return NotFound();
+			}
+
+			var table = await _context.Tables.FirstOrDefaultAsync(i => i.Id == id);
+			if (table == null)
+			{
+				return NotFound();
+			}
+
+			return View(table);
+		}
+		[HttpPost, ActionName("Delete")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteConfirmed(int id)
+		{
+			if (_context.Tables == null)
+			{
+				return Problem("Entity set is null.");
+			}
+			var table = await _context.Tables.FindAsync(id);
+			if (table != null)
+			{
+				_context.Tables.Remove(table);
+			}
+
+			await _context.SaveChangesAsync();
+			return RedirectToAction("Index", "Data");
+		}
 	}
 }

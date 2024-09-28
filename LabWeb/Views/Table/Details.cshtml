@@ -1,5 +1,14 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model LabWeb.ViewModel.TableDetailsViewModel
+<a class="btn btn-dark" asp-action="Create" asp-route-id="@Model.table.Id"><i class="bi bi-plus-square-fill"></i>Add Row</a>
+<table class="table">
+	@foreach (var row in Model.rows)
+	{
+		<tr>
+			<td>@row.RowData</td>
+			<td>
+				<a class="btn btn-primary" asp-controller="Table" asp-action="Details" asp-route-id="@row.Id"><i class="bi bi-sliders2"></i>Edit</a>
+				<a class="btn btn-danger" asp-controller="Table" asp-action="Delete" asp-route-id="@row.Id"><i class="bi bi-sliders2"></i>Delete</a>
+			</td>
+		</tr>
+	}
+</table>
