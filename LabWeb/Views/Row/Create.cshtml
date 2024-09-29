@@ -1,5 +1,62 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model LabWeb.ViewModel.CreateRowViewModel
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="TableModel.Id" />
+
+    @for (int i = 0; i < Model.Fields.Count; i++)
+    {
+        <div class="form-group">
+            <label asp-for="@Model.Fields[i].Name">@Model.Fields[i].Name (@Model.Fields[i].DataType)</label>
+            <input type="text"
+                   class="form-control"
+                   name="Row[@i]"
+                   value="@Model.Row[i]"
+                   asp-for="@Model.Row[i]"
+                   data-type="@Model.Fields[i].DataType"
+                   required />
+
+            <span asp-validation-for="@Model.Fields[i].Name" class="text-danger"></span>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Add Row</button>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("form").on("submit", function (e) {
+                var isValid = true;
+
+                $("input[data-type]").each(function () {
+                    var dataType = $(this).attr("data-type");
+                    var value = $(this).val();
+
+                    if (dataType === "integer" && !/^\d+$/.test(value)) {
+                        alert("Please enter a valid integer.");
+                        isValid = false;
+                    } else if (dataType === "real" && isNaN(parseFloat(value))) {
+                        alert("Please enter a valid real number.");
+                        isValid = false;
+                    } else if (dataType === "char" && value.length !== 1) {
+                        alert("Please enter a single character.");
+                        isValid = false;
+                    } else if (dataType === "date" && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                        alert("Please enter a valid date (YYYY-MM-DD).");
+                        isValid = false;
+                    } else if (dataType === "datelnvl") {
+                        var dates = value.split(" - ");
+                        if (dates.length !== 2 || !/^\d{4}-\d{2}-\d{2}$/.test(dates[0]) || !/^\d{4}-\d{2}-\d{2}$/.test(dates[1])) {
+                            alert("Please enter a valid date interval (YYYY-MM-DD - YYYY-MM-DD).");
+                            isValid = false;
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 }

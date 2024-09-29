@@ -6,5 +6,7 @@ namespace LabWeb.ViewModel
 	{
 		public TableModel TableModel { get; set; }
 		public string RowData { get; set; }
+		public List<string> Row {  get; set; }
+		public List<FieldModel> Fields { get; set; }
 	}
 }
