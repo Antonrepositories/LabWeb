@@ -39,8 +39,6 @@ namespace LabWeb.Controllers
                 return NotFound("Table not found.");
             }
 
-            // Perform validation as before
-            // ...
             for (var i = 0; i < model.Fields.Count; i++)
             {
                 Console.WriteLine(model.Fields[i].Name + ">>>>>>>>>>>>>>");
@@ -49,15 +47,54 @@ namespace LabWeb.Controllers
             {
                 Console.WriteLine(model.Row[i] + ">>>>>>>>>>>>>>");
             }
+            for (var i = 0; i < model.Fields.Count; i++)
+            {
+                var field = model.Fields[i];
+                var fieldValue = model.Row[i];
+
+                if (string.IsNullOrEmpty(fieldValue))
+                {
+                    ModelState.AddModelError($"Row[{i}]", $"{field.Name} cannot be empty.");
+                    continue;
+                }
+
+                if (field.DataType == "datelnvl")
+                {
+                    var dates = fieldValue.Split(" - ");
+                    if (dates.Length != 2 ||
+                        !DateTime.TryParse(dates[0], out var startDate) ||
+                        !DateTime.TryParse(dates[1], out var endDate) ||
+                        startDate >= endDate)
+                    {
+                        Console.WriteLine("INVALID DATA LNVL ++++++++++++++++++++++++++++++++++");
+                        ModelState.AddModelError($"Row[{i}]", $"{field.Name} should be a valid date interval in the format YYYY-MM-DD - YYYY-MM-DD, with the first date before the second.");
+                    }
+                }
+                if (field.DataType == "date")
+                {
+                    if (!DateTime.TryParse(fieldValue, out var date))
+                    {
+                        Console.WriteLine("INVALID DATA ++++++++++++++++++++++++++++++++");
+                        ModelState.AddModelError($"Row[{i}]", $"{field.Name} should be a valid date");
+                    }
+                }
+            }
+            string rowData = string.Join("|", model.Row);
+            Console.WriteLine(rowData + "+++++++++++++++++++++++++");
 
             if (!ModelState.IsValid)
             {
+                var errors = ModelState.Select(x => x.Value.Errors)
+                           .Where(y => y.Count > 0)
+                           .ToList();
+                Console.WriteLine(errors + "----------------------------------");
+                //Console.WriteLine("INVALID DATA ++++++++++++++++++++++++++++++++");
                 model.Fields = table.Fields.ToList();
                 return View(model);
             }
 
-            string rowData = string.Join("|", model.Row);
-
+            //string rowData = string.Join("|", model.Row);
+            //Console.WriteLine(rowData + "+++++++++++++++++++++++++");
             var newRow = new RowModel
             {
                 Table = table,
