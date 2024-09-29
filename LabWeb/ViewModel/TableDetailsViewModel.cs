@@ -1,4 +1,5 @@
-﻿using LabWeb.Models;
+﻿#nullable disable
+using LabWeb.Models;
 
 namespace LabWeb.ViewModel
 {

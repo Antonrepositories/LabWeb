@@ -2,6 +2,7 @@
 using LabWeb.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LabWeb.Controllers
 {
@@ -21,12 +22,16 @@ namespace LabWeb.Controllers
 			model.BaseId = dataBase.Id;
 			return View(model);
 		}
-		public IActionResult Details(int? id)
+		public IActionResult Details(int? id, string SearchString)
 		{
 			TableDetailsViewModel model = new TableDetailsViewModel();
 			var table = _context.Tables.FirstOrDefault(x => x.Id == id);
 			model.table = table;
 			var rows = _context.Rows.Where(f => f.Table == table).ToList();
+			if (!SearchString.IsNullOrEmpty())
+			{
+				rows = rows.Where(r => r.RowData.Contains(SearchString)).ToList();
+			}
 			model.rows = rows;
 			return View(model);
 		}

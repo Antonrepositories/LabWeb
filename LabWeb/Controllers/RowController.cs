@@ -100,15 +100,92 @@ namespace LabWeb.Controllers
                 Table = table,
                 RowData = rowData
             };
-            //_context.Rows.Add(newRow);
-            //_context.SaveChanges();
+            _context.Rows.Add(newRow);
+            _context.SaveChanges();
 
             return RedirectToAction("Index", "Data");
         }
 
+        public IActionResult Edit(int? id, int? tableid)
+        {
+            var row = _context.Rows.FirstOrDefault(r => r.Id == id);
+            //Console.WriteLine(row.Table.Id + "+++++++++++++++++++++++++");
+            var table = _context.Tables.FirstOrDefault(t => t.Id == tableid);
+            //Console.WriteLine(table.Name + "+++++++++++++++++++++++++");
+            CreateRowViewModel model = new CreateRowViewModel();
+            model.TableModel = table;
+            var fields = _context.Fields.Where(f => f.Table == table).ToList();
+            model.Fields = fields;
+            model.Row = row.RowData.Split('|').ToList();
+            model.RowId = row.Id;
+            //Console.WriteLine(row.RowData + "+++++++++++++++++++++++++");
+            return View(model);
+        }
 
+        [HttpPost]
+        public IActionResult Edit(CreateRowViewModel model)
+        {
+            if (model.TableModel == null || model.TableModel.Id == 0)
+            {
+                return BadRequest("Table information is missing.");
+            }
 
+            var table = _context.Tables.FirstOrDefault(t => t.Id == model.TableModel.Id);
+            model.Fields = _context.Fields.Where(f => f.Table == table).ToList();
 
+            if (table == null)
+            {
+                return NotFound("Table not found.");
+            }
+            for (var i = 0; i < model.Fields.Count; i++)
+            {
+                var field = model.Fields[i];
+                var fieldValue = model.Row[i];
+
+                if (string.IsNullOrEmpty(fieldValue))
+                {
+                    ModelState.AddModelError($"Row[{i}]", $"{field.Name} cannot be empty.");
+                    continue;
+                }
+
+                if (field.DataType == "datelnvl")
+                {
+                    var dates = fieldValue.Split(" - ");
+                    if (dates.Length != 2 ||
+                        !DateTime.TryParse(dates[0], out var startDate) ||
+                        !DateTime.TryParse(dates[1], out var endDate) ||
+                        startDate >= endDate)
+                    {
+                        ModelState.AddModelError($"Row[{i}]", $"{field.Name} should be a valid date interval in the format YYYY-MM-DD - YYYY-MM-DD, with the first date before the second.");
+                    }
+                }
+                if (field.DataType == "date")
+                {
+                    if (!DateTime.TryParse(fieldValue, out var date))
+                    {
+                        ModelState.AddModelError($"Row[{i}]", $"{field.Name} should be a valid date");
+                    }
+                }
+            }
+            string rowData = string.Join("|", model.Row);
+
+            if (!ModelState.IsValid)
+            {
+                model.Fields = table.Fields.ToList();
+                return View(model);
+            }
+            var newRow = new RowModel
+            {
+                Id = model.RowId,
+                Table = table,
+                RowData = rowData
+            };
+            _context.Rows.Update(newRow);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", "Data");
+        }
     }
+
 }
 
