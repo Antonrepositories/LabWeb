@@ -45,6 +45,12 @@ namespace LabWeb.Controllers
 				Name = tableName,
 				Database = _context.DataBases.FirstOrDefault(b => b.Id == baseId)
 			};
+			var tables = _context.Tables.Where(t => t.Database.Id == baseId);
+			var tabletest = tables.Where(t => t.Name == tableName).ToList();
+			if (tabletest.Any())
+			{
+				return Problem("Table already exists");
+			}
 
 			for (int i = 0; i < fieldNames.Count; i++)
 			{
